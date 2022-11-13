@@ -1,6 +1,6 @@
 // main.js
 
-// CONSTANTS
+
 const RECIPE_URLS = [
   'https://introweb.tech/assets/json/1_50-thanksgiving-side-dishes.json',
   'https://introweb.tech/assets/json/2_roasting-turkey-breast-with-stuffing.json',
@@ -68,15 +68,59 @@ async function getRecipes() {
   // EXPOSE - START (All expose numbers start with A)
   // A1. TODO - Check local storage to see if there are any recipes.
   //            If there are recipes, return them.
+  if (localStorage.getItem("infiniteScrollEnabled") !== null) {
+    var reciepesLS = localStorage.getItem("recipes");
+    console.log(reciepesLS[0]);
+    return reciepesLS;
+  }
+  
   /**************************/
   // The rest of this method will be concerned with requesting the recipes
   // from the network
   // A2. TODO - Create an empty array to hold the recipes that you will fetch
+  var reciepesNet = [];
   // A3. TODO - Return a new Promise. If you are unfamiliar with promises, MDN
   //            has a great article on them. A promise takes one parameter - A
   //            function (we call these callback functions). That function will
   //            take two parameters - resolve, and reject. These are functions
   //            you can call to either resolve the Promise or Reject it.
+  const newPromise = new Promise(async (resolve, reject) => {
+    // A4
+  for (var i in RECIPE_URLS) {
+      // console.log(RECIPE_URLS[i]);
+      // A5
+      try {
+        // A6
+        await fetch(RECIPE_URLS[i]).then(
+          // A7
+           async (response) => { return await response.json()}).then(
+            data => {
+              // A8 
+              reciepesNet[i] = data;
+              // console.log(reciepesNet[i]);
+              // A9
+              if (RECIPE_URLS.length === reciepesNet.length ){
+                saveRecipesToStorage(reciepesNet);
+                // console.log("finised storing");
+                resolve(reciepesNet);
+              }
+
+            }
+
+          )
+      } catch (error) {
+        // A 10
+        console.error(error);
+        // A 11
+        reject(error);
+      }
+  }
+
+    // setTimeout(() =>{
+    //   resolve("success!");
+    // }, 100);
+  });
+  return newPromise;
   /**************************/
   // A4-A11 will all be *inside* the callback function we passed to the Promise
   // we're returning
